@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <string.h>
+
+/*
+    Programa: Cadastro e Exibição de Territórios
+    Objetivo: Criar uma base de dados simples com informações de 5 territórios
+    Autor: [Seu Nome]
+    Data: [Data atual]
+*/
+
+/* 
+    Definição da struct Territorio
+    Cada território possui:
+    - nome: nome do território
+    - cor: cor do exército que o controla
+    - tropas: quantidade de tropas presentes
+*/
+struct Territorio {
+    char nome[30];
+    char cor[10];
+    int tropas;
+};
+
+int main() {
+    struct Territorio territorios[5];  // Vetor que armazenará 5 territórios
+    int i;
+
+    printf("=== Cadastro de Territórios ===\n\n");
+
+    // Cadastro dos 5 territórios
+    for (i = 0; i < 5; i++) {
+        printf("Digite o nome do território %d: ", i + 1);
+        scanf("%s", territorios[i].nome);  // Lê o nome (sem espaços)
+
+        printf("Digite a cor do exército do território %d: ", i + 1);
+        scanf("%s", territorios[i].cor);   // Lê a cor do exército
+
+        printf("Digite a quantidade de tropas no território %d: ", i + 1);
+        scanf("%d", &territorios[i].tropas); // Lê o número de tropas
+
+        printf("\n"); // Espaço para melhor visualização
+    }
+
+    // Exibição dos dados cadastrados
+    printf("=== Dados dos Territórios Cadastrados ===\n\n");
+
+    for (i = 0; i < 5; i++) {
+        printf("Território %d:\n", i + 1);
+        printf("Nome: %s\n", territorios[i].nome);
+        printf("Cor do Exército: %s\n", territorios[i].cor);
+        printf("Tropas: %d\n", territorios[i].tropas);
+        printf("-----------------------------\n");
+    }
+
+    return 0;
+}
