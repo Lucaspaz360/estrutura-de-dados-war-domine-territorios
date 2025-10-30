@@ -1,0 +1,157 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+/*
+    Programa: Fila de Peças Futuras - Tetris Stack
+    Autor: [Lucassilvadapaz]
+    Data: [30102025]
+
+    Descrição:
+    Simula a fila de peças futuras do jogo Tetris Stack.
+    O jogador pode jogar (remover da frente) ou inserir novas peças (no final).
+    Cada peça tem um tipo ('I', 'O', 'T', 'L') e um identificador único (id).
+*/
+
+/* ==== Definição da struct que representa uma peça ==== */
+typedef struct {
+    char tipo; // Tipo da peça ('I', 'O', 'T', 'L')
+    int id;    // Identificador único da peça
+} Peca;
+
+/* ==== Definição da estrutura da fila circular ==== */
+typedef struct {
+    Peca pecas[5]; // Vetor fixo de 5 peças
+    int inicio;    // Índice da primeira peça (frente)
+    int fim;       // Índice da última peça (final)
+    int tamanho;   // Quantidade atual de peças
+} Fila;
+
+/* ==== Protótipos das funções ==== */
+void inicializarFila(Fila *fila);
+int filaVazia(Fila *fila);
+int filaCheia(Fila *fila);
+void enfileirar(Fila *fila, Peca nova);
+void desenfileirar(Fila *fila);
+void exibirFila(Fila *fila);
+Peca gerarPeca();
+
+/* ==== Variável global para controle de IDs ==== */
+int contadorID = 0;
+
+/* ==== Função principal ==== */
+int main() {
+    Fila fila;
+    int opcao;
+    srand(time(NULL)); // Semente para geração aleatória
+
+    inicializarFila(&fila);
+
+    // Preenche a fila inicialmente com 5 peças
+    for (int i = 0; i < 5; i++) {
+        Peca nova = gerarPeca();
+        enfileirar(&fila, nova);
+    }
+
+    do {
+        printf("\n===== TETRIS STACK - FILA DE PEÇAS =====\n");
+        exibirFila(&fila);
+
+        printf("\nOpções:\n");
+        printf("1 - Jogar peça (dequeue)\n");
+        printf("2 - Inserir nova peça (enqueue)\n");
+        printf("0 - Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                desenfileirar(&fila);
+                break;
+            case 2:
+                if (!filaCheia(&fila)) {
+                    Peca nova = gerarPeca();
+                    enfileirar(&fila, nova);
+                    printf("\n✅ Nova peça adicionada!\n");
+                } else {
+                    printf("\n⚠️ A fila está cheia! Jogue uma peça primeiro.\n");
+                }
+                break;
+            case 0:
+                printf("\nEncerrando o sistema... 👋\n");
+                break;
+            default:
+                printf("\n❌ Opção inválida! Tente novamente.\n");
+        }
+
+    } while (opcao != 0);
+
+    return 0;
+}
+
+/* ==== Função: inicializa os campos da fila ==== */
+void inicializarFila(Fila *fila) {
+    fila->inicio = 0;
+    fila->fim = -1;
+    fila->tamanho = 0;
+}
+
+/* ==== Verifica se a fila está vazia ==== */
+int filaVazia(Fila *fila) {
+    return (fila->tamanho == 0);
+}
+
+/* ==== Verifica se a fila está cheia ==== */
+int filaCheia(Fila *fila) {
+    return (fila->tamanho == 5);
+}
+
+/* ==== Insere nova peça no final da fila ==== */
+void enfileirar(Fila *fila, Peca nova) {
+    if (filaCheia(fila)) {
+        printf("\n⚠️ Não é possível inserir: fila cheia!\n");
+        return;
+    }
+
+    fila->fim = (fila->fim + 1) % 5; // Movimento circular
+    fila->pecas[fila->fim] = nova;
+    fila->tamanho++;
+}
+
+/* ==== Remove a peça da frente (jogar peça) ==== */
+void desenfileirar(Fila *fila) {
+    if (filaVazia(fila)) {
+        printf("\n⚠️ Não há peças para jogar! Fila vazia.\n");
+        return;
+    }
+
+    Peca jogada = fila->pecas[fila->inicio];
+    fila->inicio = (fila->inicio + 1) % 5; // Movimento circular
+    fila->tamanho--;
+
+    printf("\n🎮 Peça jogada: [%c %d]\n", jogada.tipo, jogada.id);
+}
+
+/* ==== Exibe o estado atual da fila ==== */
+void exibirFila(Fila *fila) {
+    if (filaVazia(fila)) {
+        printf("\nA fila está vazia.\n");
+        return;
+    }
+
+    printf("\nFila de peças:\n");
+    for (int i = 0; i < fila->tamanho; i++) {
+        int indice = (fila->inicio + i) % 5;
+        printf("[%c %d] ", fila->pecas[indice].tipo, fila->pecas[indice].id);
+    }
+    printf("\n");
+}
+
+/* ==== Gera uma nova peça com tipo e ID ==== */
+Peca gerarPeca() {
+    Peca nova;
+    char tipos[] = {'I', 'O', 'T', 'L'};
+    nova.tipo = tipos[rand() % 4]; // Escolhe tipo aleatório
+    nova.id = contadorID++;        // Gera ID sequencial
+    return nova;
+}
